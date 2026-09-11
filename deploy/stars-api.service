@@ -1,0 +1,55 @@
+[Unit]
+Description=Stars Service API (FastAPI)
+Documentation=https://api.qobilbek.dev/stars/docs
+After=network.target postgresql.service redis-server.service
+Wants=postgresql.service redis-server.service
+
+[Service]
+Type=exec
+User=www
+Group=www
+WorkingDirectory=/www/wwwroot/api.qobilbek.dev/stars-service
+
+# Eslatma: EnvironmentFile ATAYLAB ishlatilmaydi.
+# systemd .env ni pydantic-settings dan boshqacha parse qiladi (qo'shtirnoq,
+# JSON qiymatlar, izohlar) va systemd o'rnatgan env o'zgaruvchilar .env dan
+# USTUN turadi — ya'ni noto'g'ri parse jimgina g'olib chiqardi.
+# WorkingDirectory berilgani uchun pydantic-settings .env ni o'zi o'qiydi.
+
+# --forwarded-allow-ips: faqat nginx (127.0.0.1) ga ishonamiz.
+# Asl konfigdagi '*' ni systemd qo'shtirnoq bilan birga literal uzatardi
+# (shell emas), qolaversa '*' X-Forwarded-For'ni soxtalashtirishga yo'l ochadi.
+ExecStart=/www/wwwroot/api.qobilbek.dev/stars-service/.venv/bin/uvicorn app.main:app \
+    --host 127.0.0.1 \
+    --port 8710 \
+    --workers 2 \
+    --proxy-headers \
+    --forwarded-allow-ips=127.0.0.1 \
+    --no-server-header \
+    --root-path /stars
+
+Restart=always
+RestartSec=5
+KillSignal=SIGQUIT
+TimeoutStopSec=30
+
+# --- Xavfsizlik ---
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+
+# --- Loglar: journald (journalctl -u <servis> -f) ---
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=stars-api
+
+[Install]
+WantedBy=multi-user.target

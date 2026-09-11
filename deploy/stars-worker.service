@@ -1,0 +1,46 @@
+[Unit]
+Description=Stars Service Worker (ARQ)
+After=network.target postgresql.service redis-server.service
+Wants=postgresql.service redis-server.service
+# API bilan bir xil kod bazasi — API qayta ishga tushsa worker ham yangilansin
+PartOf=stars-api.service
+
+[Service]
+Type=exec
+User=www
+Group=www
+WorkingDirectory=/www/wwwroot/api.qobilbek.dev/stars-service
+
+# EnvironmentFile ataylab yo'q — stars-api.service dagi izohga qarang.
+
+ExecStart=/www/wwwroot/api.qobilbek.dev/stars-service/.venv/bin/arq app.workers.worker.WorkerSettings
+
+Restart=always
+RestartSec=5
+
+# SIGTERM -> ARQ joriy joblarni tugatib, keyin to'xtaydi.
+# TimeoutStopSec job_timeout (180s) dan katta bo'lishi kerak, aks holda
+# to'lov o'rtasida SIGKILL kelib, buyurtma noaniq holatda qolishi mumkin.
+KillSignal=SIGTERM
+TimeoutStopSec=240
+
+# --- Xavfsizlik ---
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+
+# --- Loglar: journald (journalctl -u <servis> -f) ---
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=stars-worker
+
+[Install]
+WantedBy=multi-user.target

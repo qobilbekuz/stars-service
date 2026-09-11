@@ -1,0 +1,28 @@
+[project]
+name = "stars-service"
+version = "1.0.0"
+description = "Telegram Stars / Premium / Gift xaridlarini avtomatlashtirish API servisi"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+addopts = "-q --strict-markers"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF"]
+ignore = ["B008", "RUF001", "RUF002", "RUF003", "N818"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+"alembic/versions/*" = ["E501"]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/workers/worker.py", "alembic/*"]

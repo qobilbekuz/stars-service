@@ -1,0 +1,24 @@
+# --- Core ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.0
+
+# --- Database ---
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+greenlet==3.1.1
+
+# --- Queue / cache ---
+redis==5.2.1
+arq==0.26.3
+
+# --- HTTP / utils ---
+httpx==0.28.1
+tenacity==9.0.0
+structlog==24.4.0
+python-multipart==0.0.20
+
+# --- Providers (optional, ixtiyoriy) ---
+# fragment-api-lib==1.0.1   # Fragment (TON seed + cookies) orqali stars/premium
